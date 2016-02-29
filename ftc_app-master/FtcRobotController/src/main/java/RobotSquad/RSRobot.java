@@ -1,6 +1,7 @@
 package RobotSquad;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
@@ -14,7 +15,8 @@ import java.lang.Math;
  * Created by Tony on 10/4/2015.
  */
 
-public class RSRobot {
+public class RSRobot
+{
 
 
     LinearOpMode opMode;
@@ -28,22 +30,34 @@ public class RSRobot {
     DcMotorController motorControllerRearDrive;
     private GyroThread gyrothread;
     private GyroSensor gyro;
-    private BucketThread bucketThread;
+    ColorSensor sensorRGB;
+    private BucketThreadSingleton bucketThread;
 
-    public enum Alliance{
-        BLUE  (1),
-        RED  (-1);
-        private final double alliance;
 
-        private Alliance(double alliance) {
+    public enum Alliance
+    {
+        BLUE(1),
+        UNKNOWN(0),
+        RED(-1);
+        private final int alliance;
+
+        private Alliance(int alliance)
+        {
             this.alliance = alliance;
         }
+
     }
 
+    static final int forward = 1;
+    static final int backward = -1;
+    static final int right = 1;
+    static final int left = -1;
 
 
     Alliance myAlliance;
-    public void setMyAlliance(Alliance myAlliance) {
+
+    public void setMyAlliance(Alliance myAlliance)
+    {
         this.myAlliance = myAlliance;
     }
 
@@ -60,12 +74,10 @@ public class RSRobot {
     //calculates how far the robot will drive for each motor encoder click
     final double onemotorclick = ((motorgearteeth / wheelgearteeth) * wheelcirccm) / motorclicksperrotation;
 
-
-
-
-
-    public void Initialize() {
-        if (gyro != null) {
+    public void Initialize()
+    {
+        if (gyro != null)
+        {
             gyrothread = new GyroThread(gyro);
 
             gyrothread.calibrategyro();
@@ -73,149 +85,80 @@ public class RSRobot {
             gyrothread.start();
         }
 
-     //   bucketthread = new BucketThread();
-
-     //   bucketthread.start();
-
-
-
         if (motorBackRight != null)
             motorBackRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         if (motorBackLeft != null)
             motorBackLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
     }
 
-    public RSRobot(GyroSensor gyro) {
+    public RSRobot(GyroSensor gyro)
+    {
         this.gyro = gyro;
     }
 
+    public double GetCurrentHeading()
+    {
+        return gyrothread.getCurrentHeading();
+    }
 
-    public void setOpMode(LinearOpMode opMode) {
+    public void setOpMode(LinearOpMode opMode)
+    {
         this.opMode = opMode;
     }
 
-    public void SetFrontRightMotor(DcMotor motor) {
+    public void SetFrontRightMotor(DcMotor motor)
+    {
         motorFrontRight = motor;
     }
 
-    public void SetFrontLeftMotor(DcMotor motor) {
+    public void SetFrontLeftMotor(DcMotor motor)
+    {
         motorFrontLeft = motor;
     }
 
-    public void SetBackRightMotor(DcMotor motor) {
+    public void SetBackRightMotor(DcMotor motor)
+    {
         motorBackRight = motor;
     }
 
-    public void SetBackLeftMotor(DcMotor motor) {
+    public void SetBackLeftMotor(DcMotor motor)
+    {
         motorBackLeft = motor;
     }
 
-    public void SetHarvesterMotor(DcMotor motor) {
+    public void SetHarvesterMotor(DcMotor motor)
+    {
         motorHarvester = motor;
     }
 
-    public void SetSpinnerMotor(DcMotor motor) {motorSpinner = motor;}
+    public void SetSpinnerMotor(DcMotor motor)
+    {
+        motorSpinner = motor;
+    }
 
-    public void setMotorControllerFrontDrive(DcMotorController motorControllerFrontDrive) {
+    public void SetColorSensor(ColorSensor color){sensorRGB = color;}
+
+    public void setMotorControllerFrontDrive(DcMotorController motorControllerFrontDrive)
+    {
         this.motorControllerFrontDrive = motorControllerFrontDrive;
     }
 
-    public void setMotorControllerRearDrive(DcMotorController motorControllerRearDrive) {
+    public void setMotorControllerRearDrive(DcMotorController motorControllerRearDrive)
+    {
         this.motorControllerRearDrive = motorControllerRearDrive;
     }
-/*
-    public long DriveForwardLegacy(double power, long distance) throws InterruptedException {
-        double encoderTarget;
-        double calculatedPow = 0;
-        int frontRightStartPosition = 0;
-        int currentPosition;
-        //set current heading to zero
-         gyrothread.setCurrentHeading(0);
-        //use a while loop to keep motors going until desired heading reached
-
-        encoderTarget = distance / onemotorclick;
-
-        motorBackLeft.setMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
-        motorControllerRearDrive.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_ONLY);
-        while (motorControllerRearDrive.getMotorControllerDeviceMode() != DcMotorController.DeviceMode.READ_ONLY) {
-            opMode.telemetry.addData("WAITING FOR READ_ONLY ", 1234);
-            opMode.waitForNextHardwareCycle();
-
-        }
-
-        //gets front rights position to be able to zero out the current position
-        frontRightStartPosition = motorBackRight.getCurrentPosition();
-
-      //  opMode.telemetry.addData("Current Encoder Position ", frontRightStartPosition);
-
-        currentPosition = frontRightStartPosition;
 
 
-
-        while (currentPosition - frontRightStartPosition < encoderTarget) {
-
-            //calculatedPow = calculateTurnPow(degrees, gyrothread.getCurrentheading(), power);
-            calculatedPow = power;
-            motorControllerRearDrive.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
-
-            while (motorControllerRearDrive.getMotorControllerDeviceMode() != DcMotorController.DeviceMode.WRITE_ONLY) {
-                opMode.telemetry.addData("WAITING FOR WRITE_ONLY", 1);
-                opMode.waitForNextHardwareCycle();
-            }
-
-
-            if (motorControllerRearDrive.getMotorControllerDeviceMode() == DcMotorController.DeviceMode.WRITE_ONLY) {
-                motorBackRight.setPower(calculatedPow);
-
-
-                //motorBackRight.setPower(calculatedPow);
-                motorBackLeft.setPower(calculatedPow);
-
-              //  motorControllerRearDrive.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_ONLY);
-
-            }
-
-            //motorBackLeft.setPower(calculatedPow);
-
-            motorControllerRearDrive.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_ONLY);
-            while (motorControllerRearDrive.getMotorControllerDeviceMode() != DcMotorController.DeviceMode.READ_ONLY) {
-                opMode.telemetry.addData("WAITING FOR READ_ONLY", 2);
-                opMode.waitForNextHardwareCycle();
-            }
-
-            currentPosition = motorBackLeft.getCurrentPosition();
-
-
-            opMode.telemetry.addData("Current Encoder Position ", currentPosition);
-            opMode.telemetry.addData("Current Power ", motorBackLeft.getPower());
-        }
-
-        motorControllerRearDrive.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
-        while (motorControllerRearDrive.getMotorControllerDeviceMode() != DcMotorController.DeviceMode.WRITE_ONLY) {
-            opMode.telemetry.addData("WAITING FOR WRITE_ONLY", 1);
-            opMode.waitForNextHardwareCycle();
-        }
-
-
-        motorBackRight.setPower(0);
-
-
-        //motorBackRight.setPower(calculatedPow);
-        motorBackLeft.setPower(0);
-
-
-        return (distance);
-    }
-    */
-
-    private long Spin(double power, long degrees, double direction) throws InterruptedException {
+    private long Spin(double power, long degrees, double direction) throws InterruptedException
+    {
         double calculatedPow = 0;
         //set current heading to zero
         gyrothread.setCurrentHeading(0);
         //use a while loop to keep motors going until desired heading reached
-        while (Math.abs(gyrothread.getCurrentHeading()) < (degrees-10)) {
+        while (Math.abs(gyrothread.getCurrentHeading()) < (degrees - 3))
+        {
             //calculatedPow = (calculateTurnPow(degrees, gyrothread.getCurrentHeading(), power))*direction*myAlliance.alliance;
-            calculatedPow = power*direction*myAlliance.alliance;
+            calculatedPow = power * direction * myAlliance.alliance;
             motorFrontRight.setPower(-calculatedPow);
             motorBackRight.setPower(-calculatedPow);
             motorFrontLeft.setPower(calculatedPow);
@@ -235,17 +178,112 @@ public class RSRobot {
         return (long) Math.abs(gyrothread.getCurrentHeading());
     }
 
-    public long SpinRight(double power, long degrees) throws InterruptedException {
+    public long SpinRight(double power, long degrees) throws InterruptedException
+    {
         //Calling spin function and direction 1 is right
-        return(Spin(power, degrees, 1));
+        return (Spin(power, degrees, 1));
     }
-    public long SpinLeft(double power, long degrees) throws InterruptedException {
+
+    public long SpinLeft(double power, long degrees) throws InterruptedException
+    {
         //Calling spin function and direction -1 is left
-        return(Spin(power, degrees, -1));
+        return (Spin(power, degrees, -1));
 
     }
 
-    double calculateTurnPow(double totalTurn, double currentHeading, double maxPow) {
+
+    private long ArcTurn(double power, long degrees, int turnDirection, int driveDirection) throws InterruptedException
+    {
+        double calculatedPow = 0;
+        //set current heading to zero
+        gyrothread.setCurrentHeading(0);
+        //sets turn direction based on blue alliance so red alliance will swap turn direction
+        turnDirection = turnDirection * (int) myAlliance.alliance;
+        //use a while loop to keep motors going until desired heading reached
+        while (Math.abs(gyrothread.getCurrentHeading()) < (degrees - 3))
+        {
+            if (driveDirection == forward)
+            {
+                calculatedPow = power;
+                if (turnDirection == right)
+                {
+                    motorFrontRight.setPower(-calculatedPow);
+                    motorBackRight.setPower(0);
+                    motorFrontLeft.setPower(calculatedPow);
+                    motorBackLeft.setPower(calculatedPow);
+                }
+                else
+                {
+                    motorFrontRight.setPower(calculatedPow);
+                    motorBackRight.setPower(calculatedPow);
+                    motorFrontLeft.setPower(-calculatedPow);
+                    motorBackLeft.setPower(0);
+                }
+            }
+            else
+            {
+                calculatedPow = -power;
+                if (turnDirection == right)
+                {
+                    motorFrontRight.setPower(calculatedPow);
+                    motorBackRight.setPower(calculatedPow);
+                    motorFrontLeft.setPower(-calculatedPow);
+                    motorBackLeft.setPower(0);
+                }
+                else
+                {
+                    motorFrontRight.setPower(-calculatedPow);
+                    motorBackRight.setPower(0);
+                    motorFrontLeft.setPower(calculatedPow);
+                    motorBackLeft.setPower(calculatedPow);
+                }
+            }
+
+
+            opMode.telemetry.addData("curr heading ", gyrothread.getCurrentHeading());
+
+            opMode.waitForNextHardwareCycle();
+
+        }
+        motorFrontRight.setPower(0);
+        motorBackRight.setPower(0);
+        motorFrontLeft.setPower(0);
+        motorBackLeft.setPower(0);
+        opMode.waitForNextHardwareCycle();
+        return (long) Math.abs(gyrothread.getCurrentHeading());
+    }
+
+    public long ArcTurnBackRight(double power, long degrees) throws InterruptedException
+    {
+        //
+        //Calling spin function and direction 1 is right
+        return (ArcTurn(power, degrees, right, backward));
+    }
+
+    public long ArcTurnBackLeft(double power, long degrees) throws InterruptedException
+    {
+        //Calling spin function and direction -1 is left
+        return (ArcTurn(power, degrees, left, backward));
+
+    }
+
+    public long ArcTurnFrontRight(double power, long degrees) throws InterruptedException
+    {
+        //
+        //Calling spin function and direction 1 is right
+        return (ArcTurn(power, degrees, right, forward));
+    }
+
+    public long ArcTurnFrontLeft(double power, long degrees) throws InterruptedException
+    {
+        //Calling spin function and direction -1 is left
+        return (ArcTurn(power, degrees, left, forward));
+
+    }
+
+
+    double calculateTurnPow(double totalTurn, double currentHeading, double maxPow)
+    {
         double calculatedPow = 0;
         double rampUpCalcPow = 0;
         double minSpinRampUpPow = .6;
@@ -262,14 +300,16 @@ public class RSRobot {
         calculatedPow = Math.min(maxPow, rampUpCalcPow);
         calculatedPow = Math.min(calculatedPow, rampDownCalcPow);
 
-        if (calculatedPow < minSpinRampDownPow) {
+        if (calculatedPow < minSpinRampDownPow)
+        {
             calculatedPow = minSpinRampDownPow;
 
         }
         return Range.clip(calculatedPow, -1, 1);
     }
 
-    double calculateDrivePow(double totalDistance, double currentDistance, double maxPow) {
+    double calculateDrivePow(double totalDistance, double currentDistance, double maxPow)
+    {
         double calculatedPow = 0;
         double rampUpCalcPow = 0;
         double minPow = .6;
@@ -285,14 +325,16 @@ public class RSRobot {
         calculatedPow = Math.min(maxPow, rampUpCalcPow);
         calculatedPow = Math.min(calculatedPow, rampDownCalcPow);
 
-        if (calculatedPow < minPow) {
+        if (calculatedPow < minPow)
+        {
             calculatedPow = minPow;
 
         }
         return Range.clip(calculatedPow, -1, 1);
     }
 
-    private long DriveStallDetection(double power, long distance, double direction) throws InterruptedException {
+    private long DriveStallDetection(double power, long distance, double direction) throws InterruptedException
+    {
         double encoderTarget;
         double calculatedPow = 0;
         double currentHeading = 0;
@@ -300,8 +342,8 @@ public class RSRobot {
         double rightCalculatedPow = 0;
         int leftStallPos = 0;
         int rightStallPos = 0;
-        int leftMotorPos=0;
-        int rightMotorPos=0;
+        int leftMotorPos = 0;
+        int rightMotorPos = 0;
         int leftStallCutoff;
         int rightStallCutoff;
         int leftStallCount = 0;
@@ -320,7 +362,7 @@ public class RSRobot {
 
         motorFrontRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         motorFrontLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        while(motorFrontRight.getCurrentPosition() != 0 || motorBackRight.getCurrentPosition() != 0)
+        while (motorFrontRight.getCurrentPosition() != 0 || motorBackRight.getCurrentPosition() != 0)
         {
             opMode.waitForNextHardwareCycle();
         }
@@ -334,12 +376,15 @@ public class RSRobot {
         while (Math.abs(motorFrontLeft.getCurrentPosition()) < encoderTarget &&
                 Math.abs(motorFrontRight.getCurrentPosition()) < encoderTarget &&
                 !isLeftMotorStalled &&
-                !isRightMotorStalled) {
+                !isRightMotorStalled)
+        {
 
             currentHeading = gyrothread.getCurrentHeading();
             //calculatedPow = calculateDrivePow(distance, motorFrontLeft.getCurrentPosition()*onemotorclick, power)*direction;
-            leftCalculatedPow = Range.clip((power * direction) - (currentHeading / 10), -1, 1);;
-            rightCalculatedPow = Range.clip((power * direction) + (currentHeading / 10), -1, 1);;
+            leftCalculatedPow = Range.clip((power * direction) - (currentHeading / 10), -1, 1);
+
+            rightCalculatedPow = Range.clip((power * direction) + (currentHeading / 10), -1, 1);
+
 
             motorBackLeft.setPower(leftCalculatedPow);
             motorBackRight.setPower(rightCalculatedPow);
@@ -360,7 +405,7 @@ public class RSRobot {
             //		nxtDisplayTextLine( 7, "R %d", rightMotorPos );
 
             //if trying to move and not successfully moving
-            if (( leftCalculatedPow != 0) && (Math.abs(leftMotorPos - leftStallPos) <= leftStallCutoff))
+            if ((leftCalculatedPow != 0) && (Math.abs(leftMotorPos - leftStallPos) <= leftStallCutoff))
             {
                 //if stalling for 50 rounds through the loop (.5 second)
                 if (++leftStallCount == 20)
@@ -381,7 +426,7 @@ public class RSRobot {
             leftStallPos = leftMotorPos;
 
             //if trying to move and not successfully moving
-            if (( rightCalculatedPow != 0) && (Math.abs(rightMotorPos - rightStallPos) <= rightStallCutoff))
+            if ((rightCalculatedPow != 0) && (Math.abs(rightMotorPos - rightStallPos) <= rightStallCutoff))
             {
                 //if stalling for 50 rounds through the loop
                 if (++rightStallCount == 20)
@@ -412,19 +457,190 @@ public class RSRobot {
         motorFrontRight.setPower(0);
         opMode.waitForNextHardwareCycle();
 
-        if(isLeftMotorStalled || isRightMotorStalled)
+        if (isLeftMotorStalled || isRightMotorStalled)
         {
-            if(leftMotorPos >rightMotorPos)
+            if (leftMotorPos > rightMotorPos)
 
-                distance = (long)(leftMotorPos*onemotorclick);
+                distance = (long) (leftMotorPos * onemotorclick);
             else
-                distance = (long)(rightMotorPos*onemotorclick);
+                distance = (long) (rightMotorPos * onemotorclick);
         }
 
         return (distance);
     }
 
-    private long Drive(double power, long distance, double direction) throws InterruptedException {
+    public long DriveForwardStallDetection(double power, long distance) throws InterruptedException
+    {
+        //Calling drive function and 1 is forward
+        return (DriveStallDetection(power, distance, 1));
+    }
+
+    public long DriveBackwardStallDetection(double power, long distance) throws InterruptedException
+    {
+        //Calling drive function and -1 is backward
+        return (DriveStallDetection(power, distance, -1));
+    }
+    private long DriveStallDetectionToTape(double power, long distance, double direction) throws InterruptedException
+    {
+        double encoderTarget;
+        double calculatedPow = 0;
+        double currentHeading = 0;
+        double leftCalculatedPow = 0;
+        double rightCalculatedPow = 0;
+        int leftStallPos = 0;
+        int rightStallPos = 0;
+        int leftMotorPos = 0;
+        int rightMotorPos = 0;
+        int leftStallCutoff;
+        int rightStallCutoff;
+        int leftStallCount = 0;
+        int rightStallCount = 0;
+        int leftMagicNumberofDeath = 4; //(2560 * 0.01)/4;  //encoder ticks per 10msec
+        int rightMagicNumberofDeath = 4; //(2560 * 0.01)/4;  //encoder ticks per 10msec
+        boolean isLeftMotorStalled = false;
+        boolean isRightMotorStalled = false;
+        boolean tapeFound = false;
+
+
+
+        //set current heading to zero
+        gyrothread.setCurrentHeading(0);
+        //use a while loop to keep motors going until desired heading reached
+
+        motorControllerFrontDrive.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_WRITE);
+
+        motorFrontRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        motorFrontLeft.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        while (motorFrontRight.getCurrentPosition() != 0 || motorBackRight.getCurrentPosition() != 0)
+        {
+            opMode.waitForNextHardwareCycle();
+        }
+        motorFrontRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        motorFrontLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+
+        opMode.waitForNextHardwareCycle();
+
+        encoderTarget = distance / onemotorclick;
+
+        while (Math.abs(motorFrontLeft.getCurrentPosition()) < encoderTarget &&
+                Math.abs(motorFrontRight.getCurrentPosition()) < encoderTarget &&
+                !isLeftMotorStalled &&
+                !isRightMotorStalled &&
+                !tapeFound)
+
+        {
+
+            currentHeading = gyrothread.getCurrentHeading();
+            //calculatedPow = calculateDrivePow(distance, motorFrontLeft.getCurrentPosition()*onemotorclick, power)*direction;
+            leftCalculatedPow = Range.clip((power * direction) - (currentHeading / 10), -1, 1);
+
+            rightCalculatedPow = Range.clip((power * direction) + (currentHeading / 10), -1, 1);
+
+
+            motorBackLeft.setPower(leftCalculatedPow);
+            motorBackRight.setPower(rightCalculatedPow);
+            motorFrontLeft.setPower(leftCalculatedPow);
+            motorFrontRight.setPower(rightCalculatedPow);
+
+            opMode.telemetry.addData("Current Encoder Position ", motorFrontRight.getCurrentPosition());
+            opMode.telemetry.addData("Current Heading ", currentHeading);
+            opMode.telemetry.addData("left power ", leftCalculatedPow);
+            opMode.telemetry.addData("right power ", rightCalculatedPow);
+
+            leftMotorPos = motorFrontLeft.getCurrentPosition();
+            rightMotorPos = motorFrontRight.getCurrentPosition();
+            leftStallCutoff = leftMagicNumberofDeath;
+            rightStallCutoff = rightMagicNumberofDeath;
+
+//			nxtDisplayBigTextLine( 5, "L %d", leftMotorPos );
+            //		nxtDisplayTextLine( 7, "R %d", rightMotorPos );
+
+            //if trying to move and not successfully moving
+            if ((leftCalculatedPow != 0) && (Math.abs(leftMotorPos - leftStallPos) <= leftStallCutoff))
+            {
+                //if stalling for 50 rounds through the loop (.5 second)
+                if (++leftStallCount == 20)
+                {
+                    //left motor has stalled.
+                    isLeftMotorStalled = true;
+
+                }
+            }
+            else
+            {
+                // not stalled, reset stall counter
+                leftStallCount = 0;
+
+                isLeftMotorStalled = false;
+            }
+            //remembers encoder Pos for the next time through the loop
+            leftStallPos = leftMotorPos;
+
+            //if trying to move and not successfully moving
+            if ((rightCalculatedPow != 0) && (Math.abs(rightMotorPos - rightStallPos) <= rightStallCutoff))
+            {
+                //if stalling for 50 rounds through the loop
+                if (++rightStallCount == 20)
+                {
+                    //right motor has stalled.
+                    isRightMotorStalled = true;
+
+
+                }
+            }
+            else
+            {
+                // not stalled, reset stall counter
+                rightStallCount = 0;
+
+                isRightMotorStalled = false;
+            }
+            //remembers encoder Pos for the next time through the loop
+            rightStallPos = rightMotorPos;
+
+            //Check color sensor for alliance color tape
+
+            if (GetColorRGB() == myAlliance)
+            {
+                tapeFound = true;
+            }
+
+            opMode.waitForNextHardwareCycle();
+
+        }
+
+        motorBackLeft.setPower(0);
+        motorFrontLeft.setPower(0);
+        motorBackRight.setPower(0);
+        motorFrontRight.setPower(0);
+        opMode.waitForNextHardwareCycle();
+
+        if (isLeftMotorStalled || isRightMotorStalled)
+        {
+            if (leftMotorPos > rightMotorPos)
+
+                distance = (long) (leftMotorPos * onemotorclick);
+            else
+                distance = (long) (rightMotorPos * onemotorclick);
+        }
+
+        return (distance);
+    }
+
+    public long DriveForwardStallDetectionToTape(double power, long distance) throws InterruptedException
+    {
+        //Calling drive function and 1 is forward
+        return (DriveStallDetectionToTape(power, distance, 1));
+    }
+
+    public long DriveBackwardStallDetectionToTape(double power, long distance) throws InterruptedException
+    {
+        //Calling drive function and -1 is backward
+        return (DriveStallDetectionToTape(power, distance, -1));
+    }
+
+    private long Drive(double power, long distance, double direction) throws InterruptedException
+    {
         double encoderTarget;
         double calculatedPow = 0;
         double currentHeading = 0;
@@ -438,8 +654,8 @@ public class RSRobot {
         motorControllerFrontDrive.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_WRITE);
 
         motorFrontRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-       // motorFrontLeftt.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        while(motorFrontRight.getCurrentPosition() != 0 /*|| motorBackRight.getCurrentPosition() != 0*/)
+        // motorFrontLeftt.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        while (motorFrontRight.getCurrentPosition() != 0 /*|| motorBackRight.getCurrentPosition() != 0*/)
         {
             opMode.waitForNextHardwareCycle();
         }
@@ -450,12 +666,15 @@ public class RSRobot {
 
         encoderTarget = distance / onemotorclick;
 
-        while (Math.abs(motorFrontRight.getCurrentPosition()) < encoderTarget) {
+        while (Math.abs(motorFrontRight.getCurrentPosition()) < encoderTarget)
+        {
 
             currentHeading = gyrothread.getCurrentHeading();
             //calculatedPow = calculateDrivePow(distance, motorFrontLeft.getCurrentPosition()*onemotorclick, power)*direction;
-            leftCalculatedPow = Range.clip((power * direction) - (currentHeading / 10), -1, 1);;
-            rightCalculatedPow = Range.clip((power * direction) + (currentHeading / 10), -1, 1);;
+            leftCalculatedPow = Range.clip((power * direction) - (currentHeading / 10), -1, 1);
+            ;
+            rightCalculatedPow = Range.clip((power * direction) + (currentHeading / 10), -1, 1);
+            ;
 
             motorBackLeft.setPower(leftCalculatedPow);
             motorBackRight.setPower(rightCalculatedPow);
@@ -479,22 +698,78 @@ public class RSRobot {
         return (distance);
     }
 
-    public long DriveForward(double power, long distance) throws InterruptedException {
+    public long DriveForward(double power, long distance) throws InterruptedException
+    {
         //Calling drive function and 1 is forward
-        return(Drive(power, distance, 1));
+        return (Drive(power, distance, 1));
     }
-    public long DriveBackward(double power, long distance) throws InterruptedException {
+
+    public long DriveBackward(double power, long distance) throws InterruptedException
+    {
         //Calling drive function and -1 is backward
-        return(Drive(power, distance, -1));
+        return (Drive(power, distance, -1));
     }
-    public long DriveForwardStallDetection(double power, long distance) throws InterruptedException {
-        //Calling drive function and 1 is forward
-        return(DriveStallDetection(power, distance, 1));
+
+
+    private long LineDrive(double power, long distance) throws InterruptedException
+    {
+        double encoderTarget;
+        double calculatedPow = 0;
+        double leftCalculatedPow = 0;
+        double rightCalculatedPow = 0;
+        double currentLight = 0;
+
+
+        //use a while loop to keep motors going until desired heading reached
+
+        motorControllerFrontDrive.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_WRITE);
+
+        motorFrontRight.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        // motorFrontLeftt.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        while (motorFrontRight.getCurrentPosition() != 0 /*|| motorBackRight.getCurrentPosition() != 0*/)
+        {
+            opMode.waitForNextHardwareCycle();
+        }
+        motorFrontRight.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        //motorFrontLeft.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+
+        opMode.waitForNextHardwareCycle();
+
+        encoderTarget = distance / onemotorclick;
+
+        while (Math.abs(motorFrontRight.getCurrentPosition()) < encoderTarget)
+        {
+
+            currentLight = GetODSValue();
+            //calculatedPow = calculateDrivePow(distance, motorFrontLeft.getCurrentPosition()*onemotorclick, power)*direction;
+            leftCalculatedPow = Range.clip((-power) - ((0.5 - currentLight) / 5), -1, 1);
+
+            rightCalculatedPow = Range.clip((-power) + ((0.5 - currentLight) / 5), -1, 1);
+
+
+            motorBackLeft.setPower(leftCalculatedPow);
+            motorBackRight.setPower(rightCalculatedPow);
+            motorFrontLeft.setPower(leftCalculatedPow);
+            motorFrontRight.setPower(rightCalculatedPow);
+
+            opMode.telemetry.addData("Current Encoder Position ", motorFrontRight.getCurrentPosition());
+            opMode.telemetry.addData("Current Light ", currentLight);
+            opMode.telemetry.addData("left power ", leftCalculatedPow);
+            opMode.telemetry.addData("right power ", rightCalculatedPow);
+            opMode.waitForNextHardwareCycle();
+
+        }
+
+        motorBackLeft.setPower(0);
+        motorFrontLeft.setPower(0);
+        motorBackRight.setPower(0);
+        motorFrontRight.setPower(0);
+        opMode.waitForNextHardwareCycle();
+
+        return (distance);
     }
-    public long DriveBackwardStallDetection(double power, long distance) throws InterruptedException {
-        //Calling drive function and -1 is backward
-        return(DriveStallDetection(power, distance, -1));
-    }
+
+
     public void auto_1_OMC(Alliance alliance, long delay) throws InterruptedException
     {
         //allows us to use the code on red and blue
@@ -502,7 +777,6 @@ public class RSRobot {
 
         //wait for the specified delay
         opMode.sleep(delay * 1000);
-
 
 
         //robot.SpinRight(1, 360);
@@ -525,7 +799,6 @@ public class RSRobot {
 
         //wait for the specified delay
         opMode.sleep(delay * 1000);
-
 
 
         //robot.SpinRight(1, 360);
@@ -582,10 +855,10 @@ public class RSRobot {
 
         opMode.sleep(delay * 1000);
 
-        DriveBackward(.5,30);
+        DriveBackward(.5, 30);
         opMode.sleep(1000);
 
-        DriveForward(.5,25);
+        DriveForward(.5, 25);
 
         //start moving
         dropHarvester();
@@ -597,8 +870,8 @@ public class RSRobot {
         reverseSpinner();
 
         distanceDriven = DriveBackwardStallDetection(.5, 165);
-       // DriveBackward(.5, 170);
-        if(distanceDriven < 165)
+        // DriveBackward(.5, 170);
+        if (distanceDriven < 165)
         {
             stopSpinner();
             raiseHarvester();
@@ -606,7 +879,7 @@ public class RSRobot {
             dropHarvester();
             opMode.sleep(3000);
             reverseSpinner();
-            DriveBackward(.5, 165-distanceDriven + 30);
+            DriveBackward(.5, 165 - distanceDriven + 30);
         }
 
 
@@ -635,8 +908,8 @@ public class RSRobot {
 
         reverseSpinner();
 
-       // distanceDriven = DriveBackwardStallDetection(.5, 330);
-         DriveBackward(.5, 210);
+        // distanceDriven = DriveBackwardStallDetection(.5, 330);
+        DriveBackward(.5, 210);
         //if(distanceDriven < 330)
         //{
         //    stopSpinner();
@@ -696,60 +969,59 @@ public class RSRobot {
 
         SpinLeft(1, 135);
 
-        opMode.sleep (1000);
+        opMode.sleep(1000);
 
         DriveForward(1, 150);
 
 
     }
 
-    public void initializeHarvester () throws InterruptedException
+    public void initializeHarvester()
     {
-        bucketThread = new BucketThread(motorHarvester);
+        bucketThread = BucketThreadSingleton.getBucketThread();
 
-        bucketThread.InitializeBucket();
-
+        bucketThread.InitializeBucket(motorHarvester);
     }
 
-    public void dropHarvester () throws InterruptedException
+    public void dropHarvester() throws InterruptedException
     {
         bucketThread.targetPos = -1450;
     }
 
-    public void raiseHarvester () throws InterruptedException
+    public void raiseHarvester() throws InterruptedException
     {
         bucketThread.targetPos = -50;
     }
 
-    public void recalibrateHarvester () throws InterruptedException
+    public void recalibrateHarvester() throws InterruptedException
     {
         //resets the target position to where the bucket is currently (used at ground)
         bucketThread.targetPos = motorHarvester.getCurrentPosition();
     }
 
-    public void reverseSpinner () throws InterruptedException
+    public void reverseSpinner() throws InterruptedException
     {
         motorSpinner.setPower(-1);
     }
 
-    public void intakeSpinner () throws InterruptedException
+    public void intakeSpinner() throws InterruptedException
     {
-        motorSpinner.setPower (1);
+        motorSpinner.setPower(1);
     }
 
-    public void stopSpinner () throws InterruptedException
+    public void stopSpinner() throws InterruptedException
     {
         motorSpinner.setPower(0);
     }
 
-    public void startHarvester () throws  InterruptedException
+    public void startHarvester() throws InterruptedException
     {
-
         motorHarvester.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        bucketThread.start();
+        bucketThread.startBucketThread();
+        bucketThread.startTimer(32);
     }
 
-    public void stopHarvester () throws  InterruptedException
+    public void stopHarvester() throws InterruptedException
     {
         bucketThread.stopBucketThread();
     }
@@ -791,5 +1063,34 @@ public class RSRobot {
     }
 
 
+    // RSColor
+    // red
+    // blue
+    // other
+    private Alliance GetColorRGB()
+    {
+        int redTapeThreshold = 120;
+        int blueTapeThreshold = 100;
+        Alliance allianceColor;
+        if (sensorRGB.red() > redTapeThreshold)
+        {
+            allianceColor = Alliance.RED;
+        }
+        else if(sensorRGB.blue() > blueTapeThreshold)
+        {
+            allianceColor = Alliance.BLUE;
+        }
+        else
+        {
+            allianceColor = Alliance.UNKNOWN;
+        }
+        return allianceColor;
+    }
+
+    // intensity value from ODS 0.0-1.0
+    public double GetODSValue()
+    {
+        return 0;
+    }
 
 }

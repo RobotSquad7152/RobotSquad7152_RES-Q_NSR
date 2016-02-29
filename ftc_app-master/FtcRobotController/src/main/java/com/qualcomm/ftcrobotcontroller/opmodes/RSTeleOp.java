@@ -39,7 +39,8 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-import RobotSquad.BucketThread;
+
+import RobotSquad.BucketThreadSingleton;
 
 /**
  * TeleOp Mode
@@ -70,7 +71,7 @@ public class RSTeleOp extends OpMode
     Servo servoClimber;
 
 
-    BucketThread bucketThread;
+    BucketThreadSingleton bucketThread;
     double leftPower = 0;
     double rightPower = 0;
     double armPower = 0;
@@ -150,9 +151,9 @@ public class RSTeleOp extends OpMode
         servoClimber = hardwareMap.servo.get("servo_climber");
         servoClimber.setPosition(servoClimberClose);
 
-        bucketThread = new BucketThread(motorBucket);
+        bucketThread =  BucketThreadSingleton.getBucketThread();
 
-        bucketThread.InitializeBucket();
+        bucketThread.InitializeBucket(motorBucket);
 
         bucketTarget = motorBucket.getCurrentPosition();
 
@@ -168,8 +169,9 @@ public class RSTeleOp extends OpMode
     {
         motorBucket.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
-        bucketThread.start();
+        bucketThread.startBucketThread();
 
+        bucketTarget = motorBucket.getCurrentPosition();
     }
 
 

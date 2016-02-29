@@ -24,6 +24,7 @@ public class LinearCameraOp extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException
     {
+        waitForStart();
         int middle = 0;
         RSCamera rsCamera = new RSCamera((FtcRobotControllerActivity)hardwareMap.appContext, telemetry);
         rsCamera.init();

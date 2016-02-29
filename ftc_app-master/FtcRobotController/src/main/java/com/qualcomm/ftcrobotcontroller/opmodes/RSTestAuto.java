@@ -31,76 +31,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
-import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import RobotSquad.RSRobot;
 
-/**
- * A simple example of a linear op mode that will approach an IR beacon
- */
-public class RStest2 extends LinearOpMode
-{
+
+public class RSTestAuto extends RSLinearOpMode {
+  @Override
+  public void runOpMode() throws InterruptedException {
+
+   InitHardware();
+    robot.setMyAlliance(RSRobot.Alliance.BLUE);
+
+    waitForStart();
+    robot.startHarvester();
 
 
-    //GyroSensor gyro;
-    OpticalDistanceSensor ods;
-    ColorSensor color;
+      robot.DriveBackward(.5,20);
+      sleep(1000);
+      robot.ArcTurnBackLeft(.5,90);
 
-    //GyroThread gyrothread;
 
-    @Override
-    public void runOpMode() throws InterruptedException
-    {
-//        gyro = hardwareMap.gyroSensor.get("gyro");
-//        gyro.calibrate();
-//        while (gyro.isCalibrating())
-//        {
-//            try
-//            {
-//                sleep(5);
-//            } catch (InterruptedException e)
-//            {
-//                e.printStackTrace();
-//            }
-//        }
-        ods = hardwareMap.opticalDistanceSensor.get("ods");
-        color = hardwareMap.colorSensor.get("color");
+//    //robot.DriveBackward(.1, 1000);
+//      for( int i=0; i<3000; i++)
+//      {
+//          sleep(10);
+//          telemetry.addData("curr heading ", robot.GetCurrentHeading());
+//      }
+    robot.stopHarvester();
 
-        waitForStart();
-
-        ods.enableLed(true);
-        color.enableLed(true);
-
-  //      int i = 0;
-
-        while (opModeIsActive())
-
-        {
-            //telemetry.addData("ods, ", ods.getLightDetected());
-            //telemetry.addData("ods raw, ", ods.getLightDetectedRaw());
-            telemetry.addData("Red, ", color.red());
-            telemetry.addData("Blue, ", color.blue());
-            telemetry.addData("Green, ", color.green());
-
- //          telemetry.addData("i, ", i);
-//            if (i++ % 1000 == 0)
-//            {
-//                gyro.resetZAxisIntegrator();
-//            }
-            try
-            {
-                sleep(5);
-            } catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        ods.enableLed(false);
-
-    }
-
+  }
 }
-

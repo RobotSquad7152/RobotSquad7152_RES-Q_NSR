@@ -44,6 +44,11 @@ public class RSCamera {
 
         data = parameters.flatten();
 
+        parameters.setColorEffect("whiteboard");
+
+        camera.setParameters(parameters);
+
+        camera.setDisplayOrientation(90);
 
         ((FtcRobotControllerActivity) context).initPreviewLinear(camera, this, previewCallback);
     }
@@ -113,7 +118,7 @@ public class RSCamera {
             int blueEndCounter = 0;
             int redEndCounter = 0;
             int blueTarget = 100;
-            int redTarget = 170;
+            int redTarget = 120;
             int blueStart = 0;
             int redStart = 0;
             int blueEnd = 0;

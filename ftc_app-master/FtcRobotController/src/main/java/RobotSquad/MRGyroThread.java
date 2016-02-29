@@ -7,7 +7,7 @@ import java.util.Calendar;
 /**
  * Created by Tony on 9/20/2015.
  */
-public class GyroThread extends Thread
+public class MRGyroThread extends Thread
 {
 
 
@@ -15,7 +15,7 @@ public class GyroThread extends Thread
     double calibratedGyroRotation;
     GyroSensor gyro;
 
-    public GyroThread(GyroSensor g)
+    public MRGyroThread(GyroSensor g)
     {
         currentHeading = 0;
         gyro = g;
@@ -27,8 +27,13 @@ public class GyroThread extends Thread
 
     public double getCurrentHeading()
     {
-        return currentHeading;
-    }
+        currentHeading = gyro.getHeading();
+        if(currentHeading > 180){
+            //MR gyro returns 0 through 359.  We need it to return 0 through 180
+            currentHeading = currentHeading-360;
+            //gyro.
+        }
+        return currentHeading;}
 
     public void setCurrentHeading(double currentHeading)
     {

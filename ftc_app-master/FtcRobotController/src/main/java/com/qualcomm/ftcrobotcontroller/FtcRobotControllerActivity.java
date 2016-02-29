@@ -128,7 +128,7 @@ public class FtcRobotControllerActivity extends Activity {
     for (int i = 0; i < numberOfCameras; i++) {
       Camera.CameraInfo info = new Camera.CameraInfo();
       Camera.getCameraInfo(i, info);
-      if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+      if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
         cameraId = i;
         DbgLog.msg("Found Camera");
         break;

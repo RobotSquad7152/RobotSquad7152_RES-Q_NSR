@@ -56,6 +56,7 @@ public class FtcOpModeRegister implements OpModeRegister {
      */
 
     //Test Program
+    manager.register("RStest2", RStest2.class);
     //manager.register("RStest2", RStest2.class);
     manager.register("Pre_Match_Test", Pre_Match_Test.class);
 
@@ -63,7 +64,10 @@ public class FtcOpModeRegister implements OpModeRegister {
 
     //Tele-op Program
     manager.register("RSTeleOp", RSTeleOp.class);
-   // manager.register("ServoTest", ServoTest.class);
+
+    manager.register("RSTestAuto", RSTestAuto.class);
+
+    manager.register("ServoTest", ServoTest.class);
     manager.register("LinearCameraOp", LinearCameraOp.class);
     //Autonomous Programs
       //Blue Alliance Programs No Delays
@@ -75,6 +79,7 @@ public class FtcOpModeRegister implements OpModeRegister {
       manager.register("R_3_PZ_0", R_3_PZ_0.class);
       manager.register("R_1_PZ_10", R_1_PZ_10.class);
       manager.register("R_3_PZ_10", R_3_PZ_10.class);
+
 //      manager.register("B_1_OMR_0", B_1_OMR_0.class);
 //      manager.register("B_1_OMB_0", B_1_OMB_0.class);
       //manager.register("B_3_OMR_0", B_3_OMR_0.class);

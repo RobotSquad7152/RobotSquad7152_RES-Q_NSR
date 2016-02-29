@@ -104,12 +104,13 @@ public class ServoTest extends OpMode {
 
 
 		telemetry.addData("servo", servoZip.getPosition());
-		telemetry.addData("servoZipPosk", servoZipPos);
+		telemetry.addData("servoZipPos", servoZipPos);
 
 
 		if(gamepad2.a) {
 			//servoZipPos = 0.8; //down
-				servoZipPos = 1.0;
+				if( servoZipPos < 0.99)
+					servoZipPos += 0.01;
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
@@ -119,7 +120,8 @@ public class ServoTest extends OpMode {
 		}
 		else if (gamepad2.b) {
 			//servoZipPos = 0.25; //up
-				servoZipPos = 0.0;
+				if( servoZipPos > 0.01)
+				servoZipPos -= 0.01;
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
@@ -127,8 +129,8 @@ public class ServoTest extends OpMode {
 				}
 
 		}
-		else
-			servoZipPos = 0.5;
+//		else
+//			servoZipPos = 0.5;
 
 		servoZip.setPosition(servoZipPos);
 
