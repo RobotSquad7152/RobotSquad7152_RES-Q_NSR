@@ -31,63 +31,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.GyroSensor;
-
 import RobotSquad.RSRobot;
 
 
-public class Pre_Match_Test extends LinearOpMode {
-  RSRobot robot;
-
-  DcMotor motorFrontRight;
-  DcMotor motorFrontLeft;
-  DcMotor motorBackRight;
-  DcMotor motorBackLeft;
-
-  DcMotorController motorControllerFrontDrive;
-  DcMotorController motorControllerRearDrive;
-  GyroSensor gyro;
-
+public class B_3_Climber_0 extends RSLinearOpMode {
   @Override
   public void runOpMode() throws InterruptedException {
 
-    //initialize motors
-    motorFrontLeft = hardwareMap.dcMotor.get("motor_2");
-    motorFrontLeft.setDirection(DcMotor.Direction.FORWARD);
-    motorFrontRight = hardwareMap.dcMotor.get("motor_1");
-    motorFrontRight.setDirection(DcMotor.Direction.REVERSE);
-    motorBackLeft = hardwareMap.dcMotor.get("motor_4");
-    motorBackLeft.setDirection(DcMotor.Direction.FORWARD);
-    motorBackRight = hardwareMap.dcMotor.get("motor_3");
-    motorBackRight.setDirection(DcMotor.Direction.REVERSE);
-    motorControllerFrontDrive = hardwareMap.dcMotorController.get("frontdrive");
-    motorControllerRearDrive = hardwareMap.dcMotorController.get("reardrive");
-
-    gyro = hardwareMap.gyroSensor.get("gyro");
-
-    robot = new RSRobot(gyro);
-
-    //This lets the robot know what way to spin based on alliance
+   InitHardware();
     robot.setMyAlliance(RSRobot.Alliance.BLUE);
 
-    // pass motor objects to robot
-    robot.SetFrontRightMotor(motorFrontRight);
-    robot.SetFrontLeftMotor(motorFrontLeft);
-    robot.SetBackRightMotor(motorBackRight);
-    robot.SetBackLeftMotor(motorBackLeft);
-    robot.setMotorControllerFrontDrive(motorControllerFrontDrive);
-    robot.setMotorControllerRearDrive(motorControllerRearDrive);
-
-    robot.setOpMode(this);
-
-    // calibrate gyro etc.
-    robot.Initialize();
-
-
-    // run the test
-    robot.pre_Match_Test();
+    waitForStart();
+      robot.startHarvester();
+    robot.auto_3_Climber(RSRobot.Alliance.BLUE,0);
+    robot.stopHarvester();
   }
 }

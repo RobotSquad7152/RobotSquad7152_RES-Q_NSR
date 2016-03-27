@@ -55,22 +55,44 @@ public class FtcOpModeRegister implements OpModeRegister {
      * If two or more op modes are registered with the same name, the app will display an error.
      */
 
-    //Test Program
-    manager.register("RStest2", RStest2.class);
-    //manager.register("RStest2", RStest2.class);
-    manager.register("Pre_Match_Test", Pre_Match_Test.class);
-
-    manager.register("NullOp", NullOp.class);
-
     //Tele-op Program
     manager.register("RSTeleOp", RSTeleOp.class);
 
+    manager.register("B_1_Climber_0", B_1_Climber_0.class);
+    manager.register("R_1_Climber_0", R_1_Climber_0.class);
+
+    manager.register("B_3_Climber_0", B_3_Climber_0.class);
+    manager.register("R_3_Climber_0", R_3_Climber_0.class);
+
+    manager.register("R_3_Defense_0", R_3_Defense_0.class);
+    manager.register("B_3_Defense_0", B_3_Defense_0.class);
+
+    manager.register("R_3_Defense_6", R_3_Defense_6.class);
+    manager.register("B_3_Defense_6", B_3_Defense_6.class);
+
+    manager.register("B_3_Defense2_0", B_3_Defense2_0.class);
+    manager.register("B_3_Defense3_0", B_3_Defense3_0.class);
+
+    manager.register("R_3_Defense2_0", B_3_Defense2_0.class);
+    manager.register("R_3_Defense3_0", B_3_Defense3_0.class);
+
+    //manager.register("NullOp", NullOp.class);
+
+    //Pre Match test programs
+    manager.register("Pre_Match_Test_Blue", Pre_Match_Test_Blue.class);
+    manager.register("Pre_Match_Test_Red", Pre_Match_Test_Red.class);
+
+
     manager.register("RSTestAuto", RSTestAuto.class);
 
-    manager.register("ServoTest", ServoTest.class);
+    //manager.register("ServoTest", ServoTest.class);
     manager.register("LinearCameraOp", LinearCameraOp.class);
+
+    manager.register("RSSimpleTeleOp", RSSimpleTeleOp.class);
+    manager.register("RStest2", RStest2.class);
     //Autonomous Programs
       //Blue Alliance Programs No Delays
+    /*
       manager.register("B_1_PZ_0", B_1_PZ_0.class);
       manager.register("B_3_PZ_0", B_3_PZ_0.class);
       manager.register("B_1_PZ_10", B_1_PZ_10.class);
@@ -79,6 +101,7 @@ public class FtcOpModeRegister implements OpModeRegister {
       manager.register("R_3_PZ_0", R_3_PZ_0.class);
       manager.register("R_1_PZ_10", R_1_PZ_10.class);
       manager.register("R_3_PZ_10", R_3_PZ_10.class);
+      */
 
 //      manager.register("B_1_OMR_0", B_1_OMR_0.class);
 //      manager.register("B_1_OMB_0", B_1_OMB_0.class);
@@ -107,31 +130,6 @@ public class FtcOpModeRegister implements OpModeRegister {
      */
     manager.register("MR Gyro Test", MRGyroTest.class);
 
-    //manager.register("AdafruitRGBExample", AdafruitRGBExample.class);
-    //manager.register("ColorSensorDriver", ColorSensorDriver.class);
 
-    //manager.register("IrSeekerOp", IrSeekerOp.class);
-    //manager.register("CompassCalibration", CompassCalibration.class);
-    //manager.register("I2cAddressChangeExample", LinearI2cAddressChange.class);
-
-
-    //manager.register("NxtTeleOp", NxtTeleOp.class);
-
-    //manager.register("LinearK9TeleOp", LinearK9TeleOp.class);
-    //manager.register("LinearIrExample", LinearIrExample.class);
-
-
-    //manager.register ("PushBotManual1", PushBotManual1.class);
-    //manager.register ("PushBotAutoSensors", PushBotAutoSensors.class);
-    //manager.register ("PushBotIrEvent", PushBotIrEvent.class);
-
-    //manager.register ("PushBotManualSensors", PushBotManualSensors.class);
-    //manager.register ("PushBotOdsDetectEvent", PushBotOdsDetectEvent.class);
-    //manager.register ("PushBotOdsFollowEvent", PushBotOdsFollowEvent.class);
-    //manager.register ("PushBotTouchEvent", PushBotTouchEvent.class);
-
-    //manager.register("PushBotDriveTouch", PushBotDriveTouch.java);
-    //manager.register("PushBotIrSeek", PushBotIrSeek.java);
-    //manager.register("PushBotSquare", PushBotSquare.java);
   }
 }

@@ -1,5 +1,8 @@
 package RobotSquad;
 
+import android.util.Log;
+
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.GyroSensor;
 
 import java.util.Calendar;
@@ -9,41 +12,40 @@ import java.util.Calendar;
  */
 public class MRGyroThread extends Thread
 {
-
-
     double currentHeading;
     double calibratedGyroRotation;
     GyroSensor gyro;
 
     public MRGyroThread(GyroSensor g)
     {
-        currentHeading = 0;
         gyro = g;
+        gyro.resetZAxisIntegrator();
         calibratedGyroRotation = 0;
-
-
     }
-
 
     public double getCurrentHeading()
     {
         currentHeading = gyro.getHeading();
         if(currentHeading > 180){
-            //MR gyro returns 0 through 359.  We need it to return 0 through 180
-            currentHeading = currentHeading-360;
-            //gyro.
+            //MR gyro returns 0 through 359.  We need it to return -179 through 180
+            currentHeading = currentHeading - 360;
+
         }
         return currentHeading;}
 
     public void setCurrentHeading(double currentHeading)
     {
-        this.currentHeading = currentHeading;
+        gyro.resetZAxisIntegrator();
     }
 
 
     public void calibrategyro()
     {
-        double totalGyroReadings = 0;
+
+        gyro.calibrate();
+
+        //may be needed for finding z value
+       /* double totalGyroReadings = 0;
 
         //set the millisecond timer
         //    long millisStart = Calendar.getInstance().getTimeInMillis();
@@ -68,11 +70,12 @@ public class MRGyroThread extends Thread
 
             // millisStart = Calendar.getInstance().getTimeInMillis();
             totalGyroReadings += gyro.getRotation();
-
-
         }
+
         calibratedGyroRotation = totalGyroReadings / 500;
+        */
     }
+
 
     public void run()
     {
@@ -80,7 +83,6 @@ public class MRGyroThread extends Thread
         long currTime;
         do
         {
-
 
             try
             {
@@ -92,7 +94,7 @@ public class MRGyroThread extends Thread
 
         currTime = Calendar.getInstance().getTimeInMillis();
             // calculate turn based on gyro reading divided by the time taken since the last reading (6ms)
-            currentHeading = currentHeading + (gyro.getRotation() - calibratedGyroRotation) * ((double)(currTime-prevTime)/1000);
+         //   currentHeading = currentHeading + (gyro.getRotation() - calibratedGyroRotation) * ((double)(currTime-prevTime)/1000);
             prevTime = currTime;
         } while (true);
 

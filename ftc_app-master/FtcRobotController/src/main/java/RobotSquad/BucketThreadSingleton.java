@@ -90,9 +90,9 @@ public class BucketThreadSingleton extends Thread
                 else if ((currentPos <= (targetPos + 50)) && (currentPos >= targetPos))
                     motorHarvester.setPower(-0.02);
                 else if (currentPos > targetPos)
-                    motorHarvester.setPower(-0.2);
+                    motorHarvester.setPower(-0.2);//.2
                 else if (currentPos < targetPos)
-                    motorHarvester.setPower(0.2);
+                    motorHarvester.setPower(0.2);//.2
             }
             else
                 //never move the harvester arm when we tell the thread to stop

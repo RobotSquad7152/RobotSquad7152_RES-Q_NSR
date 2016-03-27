@@ -31,94 +31,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.GyroSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import RobotSquad.RSRobot;
 
 
-public class RSTestAuto extends RSLinearOpMode
-{
-    @Override
-    public void runOpMode() throws InterruptedException
-    {
+public class Pre_Match_Test_Blue extends RSLinearOpMode {
 
-        InitHardware();
-        robot.setMyAlliance(RSRobot.Alliance.BLUE);
+  @Override
+  public void runOpMode() throws InterruptedException {
 
-        waitForStart();
-        // robot.startHarvester();
+    InitHardware();
+    //This lets the robot know what way to spin based on alliance
+    robot.setMyAlliance(RSRobot.Alliance.BLUE);
 
 
-        /*
-        //Log.d("RSTESTAUTOIIIIIIIIIII", "About to spin");
-        robot.SpinLeft(.7, 90);
-
-        sleep(500);
-        robot.SpinLeft(.7, 90);
-
-        sleep(500);
-        robot.SpinLeft(.7, 90);
-
-        sleep(500);
-        robot.SpinLeft(.7, 90);
-
-        sleep(500);
-
-        robot.DriveForward(.5,50);
-
-        Log.d("RSTESTAUTOIIIIIIIIIII", "DONE!!!!!!!!!!!!!");
-        */
-
-//          robot.SpinRight(.7, 90);
-//
-//          Log.d("RSTESTAUTOIIIIIIIIIII", "Spun!");
-//          sleep(500);
-//          Log.d("RSTESTAUTOIIIIIIIIIII", "About to spin");
-//          robot.SpinRight(.5, 90);
-//
-//          Log.d("RSTESTAUTOIIIIIIIIIII", "Spun!");
-//          sleep(500);
-//          Log.d("RSTESTAUTOIIIIIIIIIII", "About to spin");
-//          robot.SpinRight(.5, 90);
-//
-//          Log.d("RSTESTAUTOIIIIIIIIIII", "Spun!");
-//          sleep(500);
-
-
-    //    robot.SpinRight(1, 90);
-    //  sleep(1000);
-
-    //   robot.SpinLeft(1,90);
-
-
-//    //robot.DriveBackward(.1, 1000);
-//      for( int i=0; i<3000; i++)
-//      {
-//          sleep(10);
-//          telemetry.addData("curr heading ", robot.GetCurrentHeading());
-//      }
-//    robot.stopHarvester();
-
-
-/*
-        for (int count = 0; count < 8; count ++)
-        {
-            robot.DriveBackward(.5, 100);
-            sleep(500);
-
-            robot.DriveForward(.5, 100);
-            sleep(500);
-        }
-*/
-
-        robot.DriveForwardWall(.3, 100, 10);
-
-
-    }
+    // run the test
+    robot.pre_Match_Test();
+  }
 }

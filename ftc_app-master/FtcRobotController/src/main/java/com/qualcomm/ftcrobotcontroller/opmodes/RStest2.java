@@ -43,7 +43,11 @@ import RobotSquad.RSRobot;
  */
 public class RStest2 extends LinearOpMode
 {
+//Spin testing
 
+
+
+//Sensor Testing:
 
     //GyroSensor gyro;
     OpticalDistanceSensor ods;
@@ -54,6 +58,11 @@ public class RStest2 extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
+
+
+
+
+
 //        gyro = hardwareMap.gyroSensor.get("gyro");
 //        gyro.calibrate();
 //        while (gyro.isCalibrating())
@@ -79,8 +88,8 @@ public class RStest2 extends LinearOpMode
         while (opModeIsActive())
 
         {
-            //telemetry.addData("ods, ", ods.getLightDetected());
-            //telemetry.addData("ods raw, ", ods.getLightDetectedRaw());
+            telemetry.addData("ods, ", ods.getLightDetected());
+            telemetry.addData("ods raw, ", ods.getLightDetectedRaw());
             telemetry.addData("Red, ", color.red());
             telemetry.addData("Blue, ", color.blue());
             telemetry.addData("Green, ", color.green());

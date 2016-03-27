@@ -65,17 +65,23 @@ public class RSTeleOp extends OpMode
     DcMotor motorSlide;
     DcMotor motorBucket;
     DcMotor motorSpinner;
+    DcMotor motorTape;
     Servo servoDoor;
     Servo servoHopper;
     Servo servoChurro;
     Servo servoClimber;
+    Servo servoLeftZip;
+    Servo servoRightZip;
+    Servo servoClutch;
+    Servo servoTape;
 
 
     BucketThreadSingleton bucketThread;
     double leftPower = 0;
+    double servoTapePos = 0;
     double rightPower = 0;
     double armPower = 0;
-    double deadZone = .1;
+    double deadZone = 0.1;
     double servoDoorOpen = 1.0;
     double servoDoorClose = 0;
     double servoHopperPos = 0.5;//stopped continuous
@@ -86,13 +92,35 @@ public class RSTeleOp extends OpMode
     boolean continuousSpin = false;
     boolean j1aPressed = false;
     boolean j1bPressed = false;
-    double servoChurroUp = 0.15;
-    double servoChurroDown = 0.75;
+    boolean rightZipIn = true;
+    boolean leftZipIn = true;
+
+    double servoChurroUp = 0.0;
+    double servoChurroDown = 0.7;
+
     boolean drivingForward = true;
     boolean harvesterMoving = false;
-    double servoClimberClose = 0;
-    double servoClimberOpen = 1;
+
+    double servoClimberClose = 0.16;
+    double servoClimberOpen = 0.54;
     double servoClimberPos = 0;
+
+    boolean j2lbPressed  = false;
+    boolean j2rbPressed = false;
+    boolean dogClutchEngaged  = false;
+    boolean j1BumpersPressed = false;
+
+    double servoTapeMeasurePos = 0.5;
+    double servoTapeMeasureMin = 0.5;  // do not left the tape servo go outside this range
+    double servoTapeMeasureMax = 0.98;  // 0.5 to 0.98
+
+    double servoClutchEngaged = 0.117;
+    double servoClutchDisengaged = 0.8;
+
+    double servoPosRightZipIn = 0.08;//in .08 //out .77
+    double servoPosRightZipOut = 0.7;//in .08 //out .77
+    double servoPosLeftZipIn = 0.868;  //in 0.868 out 0.1
+    double servoPosLeftZipOut = 0.17;  //in 0.868 out 0.1
 
     //double servoPos = 0.5;
 
@@ -121,22 +149,25 @@ public class RSTeleOp extends OpMode
 		Harvester port 1	motor_8			Harvester bucket
 		Harvester port 2	motor_7			Harvester spinner*/
 
-        motorFrontLeft = hardwareMap.dcMotor.get("motor_2");
+        motorFrontLeft = hardwareMap.dcMotor.get("motor_fl");
         motorFrontLeft.setDirection(DcMotor.Direction.FORWARD);
-        motorFrontRight = hardwareMap.dcMotor.get("motor_1");
+        motorFrontRight = hardwareMap.dcMotor.get("motor_fr");
         motorFrontRight.setDirection(DcMotor.Direction.REVERSE);
-        motorBackLeft = hardwareMap.dcMotor.get("motor_4");
+        motorBackLeft = hardwareMap.dcMotor.get("motor_bl");
         motorBackLeft.setDirection(DcMotor.Direction.FORWARD);
-        motorBackRight = hardwareMap.dcMotor.get("motor_3");
+        motorBackRight = hardwareMap.dcMotor.get("motor_br");
         motorBackRight.setDirection(DcMotor.Direction.REVERSE);
 
-        motorSlide = hardwareMap.dcMotor.get("motor_5");
+        motorSlide = hardwareMap.dcMotor.get("motor_slide");
         motorSlide.setDirection(DcMotor.Direction.FORWARD);
 
-        motorBucket = hardwareMap.dcMotor.get("motor_8");
+        motorTape = hardwareMap.dcMotor.get("motor_tape");
+        motorTape.setDirection(DcMotor.Direction.FORWARD);
+
+        motorBucket = hardwareMap.dcMotor.get("motor_harv_arm");
         motorBucket.setDirection(DcMotor.Direction.FORWARD);
 
-        motorSpinner = hardwareMap.dcMotor.get("motor_7");
+        motorSpinner = hardwareMap.dcMotor.get("motor_spinner");
         motorSpinner.setDirection(DcMotor.Direction.FORWARD);
 
         servoDoor = hardwareMap.servo.get("servo_door");
@@ -150,6 +181,18 @@ public class RSTeleOp extends OpMode
 
         servoClimber = hardwareMap.servo.get("servo_climber");
         servoClimber.setPosition(servoClimberClose);
+
+        servoClutch = hardwareMap.servo.get("servo_clutch");
+        servoClutch.setPosition(servoClutchDisengaged);
+
+        servoTape = hardwareMap.servo.get("servo_tape");
+        servoTape.setPosition(servoTapePos);
+
+        servoRightZip = hardwareMap.servo.get("servo_rightzip");
+        servoRightZip.setPosition(servoPosRightZipIn);
+
+        servoLeftZip = hardwareMap.servo.get("servo_leftzip");
+        servoLeftZip.setPosition(servoPosLeftZipIn);
 
         bucketThread =  BucketThreadSingleton.getBucketThread();
 
@@ -193,8 +236,8 @@ public class RSTeleOp extends OpMode
 
         //	telemetry.addData("y1 ", j1y1);
         //	telemetry.addData("x2 ", j1x2);
-        telemetry.addData("servo", servoDoor.getPosition());
-        telemetry.addData("servo", servoChurro.getPosition());
+      //  telemetry.addData("servo", servoDoor.getPosition());
+      //  telemetry.addData("servo", servoChurro.getPosition());
 
         if (j1y1 >= deadZone)
         {
@@ -248,8 +291,8 @@ public class RSTeleOp extends OpMode
             }
         }
 
-        telemetry.addData("left power", "LeftPow " + leftPower);
-        telemetry.addData("right power", "RightPow " + rightPower);
+      //  telemetry.addData("left power", "LeftPow " + leftPower);
+      //  telemetry.addData("right power", "RightPow " + rightPower);
 
         if (gamepad1.dpad_up)
         {
@@ -277,14 +320,14 @@ public class RSTeleOp extends OpMode
         {
             //servoClimberPos = (servoClimberPos + .05);
             //servoClimberPos = servoClimberOpen;
-            servoClimber.setPosition(Range.clip(servoClimberOpen, 0, 1));
+            servoClimber.setPosition(servoClimberOpen);
 
         }
         else if (gamepad1.dpad_right)
         {
             //servoClimberPos = servoClimberClose;
             //servoClimberPos = (servoClimberPos - .05);
-            servoClimber.setPosition(Range.clip(servoClimberClose, 0, 1));
+            servoClimber.setPosition(servoClimberClose);
         }
 
 
@@ -458,6 +501,109 @@ public class RSTeleOp extends OpMode
             if (!continuousSpin)
                 motorSpinner.setPower(0);
         }
+
+        if(gamepad2.a)
+        {
+
+            //check that pos is not less than the min value first
+
+
+            if(servoTapeMeasurePos > servoTapeMeasureMin)
+            {
+                //lower tape measure
+                servoTapeMeasurePos = servoTapeMeasurePos - .01;
+                servoTape.setPosition(servoTapeMeasurePos);
+            }
+        }
+        if(gamepad2.b)
+        {
+            //check that pos is not greater than the max value first
+
+            if(servoTapeMeasurePos < servoTapeMeasureMax)
+            {
+                //raise tape measure
+                servoTapeMeasurePos = servoTapeMeasurePos + .01;
+                servoTape.setPosition(servoTapeMeasurePos);
+            }
+        }
+        if(gamepad2.left_bumper)
+        {
+            //stop double press
+            if (!j2lbPressed)
+            {
+                j2lbPressed = true;
+                if (leftZipIn)
+                {
+                    //flip left climber servo
+                    servoLeftZip.setPosition(servoPosLeftZipOut);
+                }
+                else
+                {
+                    servoLeftZip.setPosition(servoPosLeftZipIn);
+                }
+               leftZipIn = !leftZipIn;
+            }
+        }
+        else
+        {
+            j2lbPressed = false;
+        }
+        if(gamepad2.right_bumper)
+        {
+            //stop double press
+            if (!j2rbPressed)
+            {
+                j2rbPressed = true;
+                if (rightZipIn)
+                {
+                    //flip left climber servo
+                    servoRightZip.setPosition(servoPosRightZipOut);
+                }
+                else
+                {
+                    servoRightZip.setPosition(servoPosRightZipIn);
+                }
+                rightZipIn = !rightZipIn;
+            }
+        }
+        else
+        {
+            j2rbPressed = false;
+        }
+        if(gamepad2.right_stick_y < -0.1 || gamepad2.right_stick_y > 0.1)
+        {
+            //Move tape measure in direction of joystick proportionally
+            motorTape.setPower(gamepad2.right_stick_y );
+        }
+        else
+        {
+            motorTape.setPower(0);
+        }
+
+        if(gamepad1.left_bumper && gamepad1.right_bumper)
+        {
+            if(!j1BumpersPressed)
+            {
+                j1BumpersPressed = true;
+                if (!dogClutchEngaged)
+                {
+                    //engage dog clutch
+                    servoClutch.setPosition(servoClutchEngaged);
+                    dogClutchEngaged = true;
+                }
+                else
+                {
+                    //disengage dog clutch
+                    servoClutch.setPosition(servoClutchDisengaged);
+                    dogClutchEngaged = false;
+                }
+            }
+        }
+        else
+        {
+            j1BumpersPressed = false;
+        }
+
 
 
 //		if( gamepad1.dpad_down )
